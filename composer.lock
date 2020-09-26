@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0f3a51416fbef7470e64fbd6a81c1b9c",
+    "content-hash": "93d5720bd81c3076d11110207af70d99",
     "packages": [
         {
             "name": "averias/phpredis-json",
-            "version": "1.3.0",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/averias/phpredis-json.git",
-                "reference": "7cb1efa7df423941a652b6ad8b7dd2bfc989c659"
+                "reference": "e6e327c510dcb352ffd490bdbe23e7a0c01f9c7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/averias/phpredis-json/zipball/7cb1efa7df423941a652b6ad8b7dd2bfc989c659",
-                "reference": "7cb1efa7df423941a652b6ad8b7dd2bfc989c659",
+                "url": "https://api.github.com/repos/averias/phpredis-json/zipball/e6e327c510dcb352ffd490bdbe23e7a0c01f9c7f",
+                "reference": "e6e327c510dcb352ffd490bdbe23e7a0c01f9c7f",
                 "shasum": ""
             },
             "require": {
@@ -28,7 +28,8 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^8.4",
-                "squizlabs/php_codesniffer": "^3.5.0"
+                "squizlabs/php_codesniffer": "^3.5.0",
+                "symplify/changelog-linker": "^7.0.2"
             },
             "type": "library",
             "autoload": {
@@ -54,7 +55,7 @@
                 "redisjson",
                 "rejson"
             ],
-            "time": "2020-01-24T19:41:36+00:00"
+            "time": "2020-01-24T17:42:18+00:00"
         },
         {
             "name": "myclabs/php-enum",

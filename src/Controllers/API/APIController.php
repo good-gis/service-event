@@ -1,6 +1,6 @@
 <?php
 
-namespace Controllers;
+namespace API\Controllers;
 
 use Exception;
 use RuntimeException;
@@ -15,6 +15,8 @@ abstract class APIController
     public array $requestParams = [];
 
     protected string $action = ''; //Название метод для выполнения
+
+    public array $formData = []; //Хранит данные из body
 
     /**
      * APIController constructor.
@@ -32,14 +34,16 @@ abstract class APIController
 
         //Определение метода запроса
         $this->method = $_SERVER['REQUEST_METHOD'];
-        if ($this->method == 'POST' && array_key_exists('HTTP_X_HTTP_METHOD', $_SERVER)) {
-            if ($_SERVER['HTTP_X_HTTP_METHOD'] == 'DELETE') {
-                $this->method = 'DELETE';
-            } else if ($_SERVER['HTTP_X_HTTP_METHOD'] == 'PUT') {
-                $this->method = 'PUT';
-            } else {
+
+        switch ($this->method) {
+            case 'POST':
+            case 'DELETE':
+            case 'PUT':
+            case 'GET':
+                $this->formData = $this->getFormData($this->method);
+                break;
+            default:
                 throw new Exception("Unexpected Header");
-            }
         }
     }
 
@@ -98,13 +102,30 @@ abstract class APIController
         }
     }
 
+    /**
+     * @param $method
+     * @return array
+     */
+    protected function getFormData($method): array
+    {
+        if ($method === 'GET') return $_GET;
+
+        $inputJSON = file_get_contents('php://input');
+        return json_decode($inputJSON, TRUE);
+    }
+
+    //все записи
     abstract protected function indexAction();
 
+    //одна запись по id
     abstract protected function viewAction();
 
+    //post на создание записи
     abstract protected function createAction();
 
+    //обновить запись
     abstract protected function updateAction();
 
+    //удалить все записи
     abstract protected function deleteAction();
 }
