@@ -4,30 +4,34 @@
 namespace API\Controllers;
 
 
-use Controllers\RedisJSONController;
+use Controllers\RedisController;
 use Exception;
 use Helpers\Validate;
 use Models\EventModel;
 
-class EventAPIController extends APIController
+class EventApiController extends ApiController
 {
     public string $apiName = 'event';
-    protected RedisJSONController $redis;
+    protected RedisController $redis;
+    protected EventModel $eventModel;
 
     /**
-     * EventAPIController constructor.
+     * EventApiController constructor.
      * @throws Exception
      */
     public function __construct()
     {
         parent::__construct();
-        $this->redis = new RedisJSONController();
+        $this->redis = new RedisController();
+        $this->eventModel = new EventModel();
     }
 
-
+    /**
+     * получить все event
+     */
     protected function indexAction()
     {
-        var_dump($this->redis->getAllEvent());
+         echo $this->eventModel->getAllEvent();
     }
 
     protected function viewAction()
@@ -39,11 +43,11 @@ class EventAPIController extends APIController
     protected function createAction()
     {
         if (Validate::validateEvent($this->formData)) {
-            $eventModel = new EventModel($this->formData);
-            $eventModel->saveEvent();
-            $this->response($eventModel, 200);
+            $this->eventModel->setPriority($this->formData['priority']);
+            $this->eventModel->setConditions($this->formData['conditions']);
+            echo $this->eventModel->saveEvent();
         } else {
-            $this->response(['error' => 'Failed create action. Please try later.'], 404);
+            echo $this->response(['error' => 'Failed create action. Check necessary fields.'], 404);
         }
     }
 

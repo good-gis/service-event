@@ -3,9 +3,10 @@
 namespace API\Controllers;
 
 use Exception;
+use JsonException;
 use RuntimeException;
 
-abstract class APIController
+abstract class ApiController
 {
     public string $apiName = '';
 
@@ -19,7 +20,7 @@ abstract class APIController
     public array $formData = []; //Хранит данные из body
 
     /**
-     * APIController constructor.
+     * ApiController constructor.
      * @throws Exception
      */
     public function __construct()
@@ -59,9 +60,9 @@ abstract class APIController
         //Если метод(действие) определен в дочернем классе API
         if (method_exists($this, $this->action)) {
             return $this->{$this->action}();
-        } else {
-            throw new RuntimeException('Invalid Method', 405);
         }
+
+        throw new RuntimeException('Invalid Method', 405);
     }
 
     protected function response($data, $status = 500)
@@ -81,16 +82,15 @@ abstract class APIController
         return ($status[$code]) ? $status[$code] : $status[500];
     }
 
-    protected function getAction()
+    protected function getAction(): ?string
     {
         $method = $this->method;
         switch ($method) {
             case 'GET':
                 if ($this->requestUri) {
                     return 'viewAction';
-                } else {
-                    return 'indexAction';
                 }
+                return 'indexAction';
             case 'POST':
                 return 'createAction';
             case 'PUT':
@@ -105,13 +105,14 @@ abstract class APIController
     /**
      * @param $method
      * @return array
+     * @throws JsonException
      */
     protected function getFormData($method): array
     {
         if ($method === 'GET') return $_GET;
 
         $inputJSON = file_get_contents('php://input');
-        return json_decode($inputJSON, TRUE);
+        return json_decode($inputJSON, TRUE, 512, JSON_THROW_ON_ERROR);
     }
 
     //все записи

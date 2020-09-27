@@ -2,11 +2,12 @@
 
 namespace Models;
 
-use Controllers\RedisJSONController;
+use Controllers\RedisController;
+use JsonException;
 
 class EventModel
 {
-    protected RedisJSONController $redisController;
+    protected RedisController $redisController;
     protected int $priority;
     protected array $conditions;
 
@@ -16,19 +17,28 @@ class EventModel
      */
     public function __construct(array $body = [])
     {
-        $this->redisController = new RedisJSONController();
+        $this->redisController = new RedisController();
         if (!empty($body)) {
             $this->priority = $body['priority'];
             $this->conditions = $body['conditions'];
         }
     }
 
-    public function saveEvent()
+    public function saveEvent(): bool
     {
-        $this->redisController->setEvent([
+        return $this->redisController->setEvent([
             'priority' => $this->priority,
             'conditions' => $this->conditions
         ]);
+    }
+
+    /**
+     * @return false|string
+     * @throws JsonException
+     */
+    public function getAllEvent()
+    {
+        return json_encode($this->redisController->getAllEvent(), JSON_THROW_ON_ERROR);
     }
 
     /**

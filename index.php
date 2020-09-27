@@ -1,8 +1,8 @@
 <?php
 require $_SERVER['DOCUMENT_ROOT'] . '/src/bootstrap.php';
 
-use API\Controllers\EventAPIController;
+use API\Controllers\EventApiController;
 
 ini_set( 'html_errors' , 0 );
-$eventAPIController = new EventAPIController();
+$eventAPIController = new EventApiController();
 $eventAPIController->run();

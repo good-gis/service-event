@@ -5,17 +5,19 @@ namespace Controllers;
 use Averias\RedisJson\Client\RedisJsonClientInterface;
 use Averias\RedisJson\Exception\RedisClientException;
 use Averias\RedisJson\Factory\RedisJsonClientFactory;
+use Helpers\Session;
 
 /**
- * Class RedisJSONController
+ * Class RedisController
  * @package Controllers
  */
-class RedisJSONController
+class RedisController
 {
     protected RedisJsonClientInterface $redisClient;
+    protected int $jsonCount;
 
     /**
-     * RedisJSONController constructor.
+     * RedisController constructor.
      * @throws RedisClientException
      */
     public function __construct()
@@ -32,15 +34,27 @@ class RedisJSONController
             'persistenceId' => null, // string for persistent connections, null for no persistent ones
             'database' => 0 // Redis database index [0..15]
         ]);
+
+        session_start();
     }
 
-    public function setEvent(array $arrData)
+    public function setEvent(array $arrData): bool
     {
-        $this->redisClient->jsonSet('event', $arrData);
+        Session::setCount();
+        var_dump($_SESSION['count']);
+        $result = $this->redisClient->jsonSet('event' . $_SESSION['count'], $arrData);
+        return $result === true;
     }
 
+    /**
+     * @return mixed
+     */
     public function getAllEvent()
     {
-        $this->redisClient->jsonGet('event');
+        $arrResult = [];
+        for($i = 0; $i <= $_SESSION['count']; $i++){
+            $arrResult[] = $this->redisClient->jsonGet('event' . $i);
+        }
+        return $arrResult;
     }
 }
