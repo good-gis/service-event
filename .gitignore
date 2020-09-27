@@ -1,3 +1,5 @@
 /vendor/
 /service/
 /.idea/
+src/Controllers/API/.DS_Store
+src/Views/.DS_Store
