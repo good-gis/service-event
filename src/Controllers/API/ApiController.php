@@ -132,7 +132,7 @@ abstract class ApiController
     //post на создание записи
     abstract protected function createAction();
 
-    //обновить запись
+    //получить запись по условиям
     abstract protected function updateAction();
 
     //удалить все записи

@@ -40,6 +40,15 @@ class EventModel
     }
 
     /**
+     * @param string $key
+     * @return array
+     */
+    public function getEvent(string $key): array
+    {
+        return $this->redisController->getEvent($key);
+    }
+
+    /**
      * @param int $priority
      */
     public function setPriority(int $priority): void

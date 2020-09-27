@@ -59,6 +59,11 @@ class RedisController
         return $arrResult;
     }
 
+    public function getEvent(string $key): array
+    {
+        return $arrResult[$key] = $this->redisClient->jsonGet($key);
+    }
+
     /**
      * @return array
      */

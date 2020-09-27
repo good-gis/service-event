@@ -4,6 +4,7 @@ namespace Controllers\API;
 
 use Controllers\RedisController;
 use Exception;
+use Helpers\ArraySort;
 use Helpers\Validate;
 use JsonException;
 use Models\EventModel;
@@ -29,7 +30,7 @@ class EventApiController extends ApiController
     }
 
     /**
-     * получить все event
+     * @throws JsonException
      */
     protected function indexAction(): void
     {
@@ -37,6 +38,10 @@ class EventApiController extends ApiController
         $this->checkResult($result);
     }
 
+    /**
+     * @param array $result
+     * @throws JsonException
+     */
     private function checkResult(array $result): void
     {
         if (!empty($result)) {
@@ -63,15 +68,46 @@ class EventApiController extends ApiController
                 $this->ApiJsonView->response(['Event is create!'], 200);
             }
         } else {
-            echo $this->response(['error' => 'Failed create action. Check necessary fields.'], 404);
+            $this->ApiJsonView->response(['error' => 'Failed create event. Check necessary fields.'], 404);
         }
     }
 
+    /**
+     * получить event по параметрам
+     * @throws JsonException
+     */
     protected function updateAction(): void
     {
+        if (Validate::validateSearchEvent($this->formData)) {
+            $arrAllEvent = $this->eventModel->getAllEvent();
+            $arrKeyParams = array_keys($this->formData['params']);
+            $arrEventSort = ArraySort::customMultiSort($arrAllEvent, 'priority');
 
+            $isFinish = false;
+            foreach ($arrEventSort as $eventKey => $eventData) {
+                foreach ($arrKeyParams as $keyParam) {
+                    if (in_array($this->formData['params'][$keyParam], $eventData['conditions'], true)) {
+                        $this->ApiJsonView->response($this->eventModel->getEvent($eventKey), 200);
+                        $isFinish = true;
+                        break;
+                    }
+                }
+                if ($isFinish) {
+                    break;
+                }
+            }
+
+            if (!$isFinish) {
+                $this->ApiJsonView->response(['error' => 'No event found.'], 200);
+            }
+        } else {
+            $this->ApiJsonView->response(['error' => 'Failed search event. Check necessary fields.'], 404);
+        }
     }
 
+    /**
+     * @throws JsonException
+     */
     protected function deleteAction(): void
     {
         session_destroy();
