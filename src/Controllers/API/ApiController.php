@@ -1,6 +1,6 @@
 <?php
 
-namespace API\Controllers;
+namespace Controllers\API;
 
 use Exception;
 use JsonException;
@@ -44,7 +44,7 @@ abstract class ApiController
                 $this->formData = $this->getFormData($this->method);
                 break;
             default:
-                throw new Exception("Unexpected Header");
+                throw new RuntimeException("Unexpected Header");
         }
     }
 
@@ -65,13 +65,19 @@ abstract class ApiController
         throw new RuntimeException('Invalid Method', 405);
     }
 
+    /**
+     * @param $data
+     * @param int $status
+     * @return false|string
+     * @throws JsonException
+     */
     protected function response($data, $status = 500)
     {
         header("HTTP/1.1 " . $status . " " . $this->requestStatus($status));
-        return json_encode($data);
+        return json_encode($data, JSON_THROW_ON_ERROR);
     }
 
-    private function requestStatus($code)
+    private function requestStatus($code): string
     {
         $status = array(
             200 => 'OK',
@@ -79,10 +85,10 @@ abstract class ApiController
             405 => 'Method Not Allowed',
             500 => 'Internal Server Error',
         );
-        return ($status[$code]) ? $status[$code] : $status[500];
+        return ($status[$code]) ?: $status[500];
     }
 
-    protected function getAction(): ?string
+    protected function getAction(): string
     {
         $method = $this->method;
         switch ($method) {
@@ -109,7 +115,9 @@ abstract class ApiController
      */
     protected function getFormData($method): array
     {
-        if ($method === 'GET') return $_GET;
+        if ($method === 'GET') {
+            return $_GET;
+        }
 
         $inputJSON = file_get_contents('php://input');
         return json_decode($inputJSON, TRUE, 512, JSON_THROW_ON_ERROR);

@@ -14,9 +14,4 @@ class Session
             $_SESSION['count']++;
         }
     }
-
-    public static function getCount(): int
-    {
-        return $_SESSION['count'] ?? 0;
-    }
 }

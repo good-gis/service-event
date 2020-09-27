@@ -3,7 +3,6 @@
 namespace Models;
 
 use Controllers\RedisController;
-use JsonException;
 
 class EventModel
 {
@@ -33,20 +32,11 @@ class EventModel
     }
 
     /**
-     * @return false|string
-     * @throws JsonException
+     * @return array
      */
-    public function getAllEvent()
+    public function getAllEvent(): array
     {
-        return json_encode($this->redisController->getAllEvent(), JSON_THROW_ON_ERROR);
-    }
-
-    /**
-     * @return int
-     */
-    public function getPriority(): int
-    {
-        return $this->priority;
+        return $this->redisController->getAllEvent();
     }
 
     /**
@@ -55,14 +45,6 @@ class EventModel
     public function setPriority(int $priority): void
     {
         $this->priority = $priority;
-    }
-
-    /**
-     * @return array
-     */
-    public function getConditions(): array
-    {
-        return $this->conditions;
     }
 
     /**

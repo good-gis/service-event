@@ -14,7 +14,6 @@ use Helpers\Session;
 class RedisController
 {
     protected RedisJsonClientInterface $redisClient;
-    protected int $jsonCount;
 
     /**
      * RedisController constructor.
@@ -34,9 +33,8 @@ class RedisController
             'persistenceId' => null, // string for persistent connections, null for no persistent ones
             'database' => 0 // Redis database index [0..15]
         ]);
-
-        session_start();
     }
+
 
     public function setEvent(array $arrData): bool
     {
@@ -47,14 +45,32 @@ class RedisController
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getAllEvent()
+    public function getAllEvent(): array
     {
         $arrResult = [];
-        for($i = 0; $i <= $_SESSION['count']; $i++){
-            $arrResult[] = $this->redisClient->jsonGet('event' . $i);
+        if (isset($_SESSION['count'])) {
+            for ($i = 0; $i <= $_SESSION['count']; $i++) {
+                $arrResult['event' . $i] = $this->redisClient->jsonGet('event' . $i);
+            }
+            return $arrResult;
         }
         return $arrResult;
+    }
+
+    /**
+     * @return array
+     */
+    public function deleteAllEvent(): array
+    {
+        $result = [];
+        if(isset($_SESSION['count'])){
+            for ($i = 0; $i <= $_SESSION['count']; $i++) {
+                $result['event' . $i] = $this->redisClient->jsonDelete('event' . $i);
+            }
+            return $result;
+        }
+        return $result;
     }
 }

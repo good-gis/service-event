@@ -1,19 +1,20 @@
 <?php
 
-
-namespace API\Controllers;
-
+namespace Controllers\API;
 
 use Controllers\RedisController;
 use Exception;
 use Helpers\Validate;
+use JsonException;
 use Models\EventModel;
+use Views\ApiJsonView;
 
 class EventApiController extends ApiController
 {
     public string $apiName = 'event';
     protected RedisController $redis;
     protected EventModel $eventModel;
+    protected ApiJsonView $ApiJsonView;
 
     /**
      * EventApiController constructor.
@@ -24,41 +25,57 @@ class EventApiController extends ApiController
         parent::__construct();
         $this->redis = new RedisController();
         $this->eventModel = new EventModel();
+        $this->ApiJsonView = new ApiJsonView();
     }
 
     /**
      * получить все event
      */
-    protected function indexAction()
+    protected function indexAction(): void
     {
-         echo $this->eventModel->getAllEvent();
+        $result = $this->eventModel->getAllEvent();
+        $this->checkResult($result);
     }
 
-    protected function viewAction()
+    private function checkResult(array $result): void
     {
-        var_dump($this->formData);
-        var_dump('1 notes');
+        if (!empty($result)) {
+            $this->ApiJsonView->response($result, 200);
+        } else {
+            $this->ApiJsonView->response(['No event found!'], 404);
+        }
     }
 
-    protected function createAction()
+    protected function viewAction(): void
+    {
+
+    }
+
+    /**
+     * @throws JsonException
+     */
+    protected function createAction(): void
     {
         if (Validate::validateEvent($this->formData)) {
             $this->eventModel->setPriority($this->formData['priority']);
             $this->eventModel->setConditions($this->formData['conditions']);
-            echo $this->eventModel->saveEvent();
+            if ($this->eventModel->saveEvent()) {
+                $this->ApiJsonView->response(['Event is create!'], 200);
+            }
         } else {
             echo $this->response(['error' => 'Failed create action. Check necessary fields.'], 404);
         }
     }
 
-    protected function updateAction()
+    protected function updateAction(): void
     {
-        var_dump('update notes');
+
     }
 
-    protected function deleteAction()
+    protected function deleteAction(): void
     {
-        var_dump($this->formData);
-        var_dump('delete notes');
+        session_destroy();
+        $result = $this->redis->deleteAllEvent();
+        $this->checkResult($result);
     }
 }
